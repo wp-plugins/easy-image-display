@@ -97,5 +97,13 @@ please post in [the plugin support forum](http://wordpress.org/support/plugin/ea
 
 == Changelog ==
 
+= 1.01 =
+* Fixed an incompatibility with other lightbox plugins
+
 = 1.0 =
 * First version
+
+== Upgrade Notice ==
+
+= 1.01 =
+Fixes an incompatibility with other lightbox plugins.

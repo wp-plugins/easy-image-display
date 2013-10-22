@@ -36,7 +36,6 @@ class sb_easy_image_display {
         add_action( 'wp_enqueue_scripts', array( $this, 'public_scripts' ) );
         add_action( 'admin_print_scripts-widgets.php', array( $this, 'sb_easy_image_widget_js' ) );
         add_action( 'admin_print_styles-widgets.php', array( $this, 'sb_easy_image_widget_css' ) );
-        add_action( 'wp_footer', array( $this, 'public_js' ) );
 
 
         /* Shortcodes --------------------------------------------------------------- */
@@ -194,7 +193,7 @@ class sb_easy_image_display {
         global $post, $wp_locale;
 
         if ( 'lightbox' == $attr['link'] ) {
-            $attr['link'] = 'file';  
+            $attr['link'] = 'file';
             $lightbox = 1;
         }
 
@@ -203,6 +202,10 @@ class sb_easy_image_display {
         // no link
         if ( isset( $attr['link'] ) && "none" == $attr['link']  ) {
             $output = preg_replace( array( '/<a[^>]*>/', '/<\/a>/'), '', $output );
+        }
+        
+        if( 1 == $lightbox ) {
+            $this->public_js();
         }
 
         return $output;
