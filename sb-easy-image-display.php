@@ -3,7 +3,7 @@
 Plugin Name: Easy Image Display
 Plugin URI: http://shellbotics.com/wordpress-plugins/easy-image-display/
 Description: An easy way to display random or latest images on your site.
-Version: 1.01
+Version: 1.0.2
 Author: Shellbot
 Author URI: http://shellbotics.com
 License: GPLv2 or later
@@ -82,6 +82,7 @@ class sb_easy_image_display {
             'size'  => 'thumbnail',
             'link' => 'file',
             'columns' => '3',
+            'filter' => 'only',
         ), $args ) );
 
         //rebuild $args array with custom values & defaults
@@ -91,6 +92,8 @@ class sb_easy_image_display {
             'size'  => $size,
             'link' => $link,  
             'columns' => $columns,
+            'filter' => $filter,
+            'ids' => $args['ids'],
         );
 
         return $this->sb_get_easy_image( $args, 'shortcode' );
@@ -107,6 +110,7 @@ class sb_easy_image_display {
             'size'  => 'thumbnail',
             'link' => 'file',
             'columns' => '3',
+            'filter' => 'only',
         ), $args ) );
 
         //rebuild $args array with custom values & defaults
@@ -116,6 +120,8 @@ class sb_easy_image_display {
             'size'  => $size,
             'link' => $link,  
             'columns' => $columns,
+            'filter' => $filter,
+            'ids' => $args['ids'],
         );
 
         return $this->sb_get_easy_image( $args, 'shortcode' );
@@ -132,6 +138,7 @@ class sb_easy_image_display {
             'size'  => 'thumbnail',
             'link' => 'file',
             'columns' => '5',
+            'filter' => 'only',
         ), $args ) );
 
         //rebuild $args array with custom values & defaults
@@ -141,6 +148,8 @@ class sb_easy_image_display {
             'size'  => $size,
             'link' => $link,  
             'columns' => $columns,
+            'filter' => $filter,
+            'ids' => $args['ids'],
         );
 
         return $this->sb_get_easy_image( $args );
@@ -149,7 +158,7 @@ class sb_easy_image_display {
 
     /* Construct query and return array of images ------------------------------- */
 
-    function sb_get_easy_image( $args, $src = '' ) {     
+    function sb_get_easy_image( $args, $src = '' ) {  
 
         $query = array (
             'post_type' => 'attachment',
@@ -157,7 +166,7 @@ class sb_easy_image_display {
         ); 
 
         if( $args['num'] ) {
-            $query['numberposts'] = $args['num'];  
+            $query['posts_per_page'] = $args['num'];  
         }
 
         $args['order'] = strtolower( $args['order'] );
@@ -169,14 +178,29 @@ class sb_easy_image_display {
                 $query['order'] = 'ASC';
             break;
         };
-
-        $attachments = get_posts( $query  );
+        
+        if( $args['ids'] && strtolower( $args['filter'] ) == 'include' ) {
+            $attachments = $this->include_action( $args, $query );
+        } elseif( $args['ids'] ) {
+            $ids = split( ',', $args['ids'] );
+            
+            if( strtolower( $args['filter'] ) == 'exclude' ) {
+                $query['post__not_in'] = $ids; 
+            } else {
+                //Default "only"
+                $query['post__in'] = $ids; 
+            }
+            
+            $attachments = get_posts( $query );
+        } else {
+            $attachments = get_posts( $query );
+        }
 
         if ( $attachments ) {
             
             $ids = '';
             foreach ( $attachments as $attachment ) {
-                $ids .= $attachment->ID.', ';
+                $ids .= $attachment->ID . ', ';
             }
             return do_shortcode( '[gallery columns="' . $args['columns'] . '" ids="' . $ids . '" size="' . strtolower( $args['size'] ) . '" link="' . strtolower( $args['link'] ) . '"]' );
 
@@ -184,6 +208,77 @@ class sb_easy_image_display {
             echo 'No images to display.';
         }
     
+    }
+    
+    
+    /* Rejig query based on action parameter -------------------------------- */
+    function include_action( $args, $query ) {
+        
+        $ids = split( ',', $args['ids'] );
+        
+        if( count( $ids ) >= $args['num'] ) {
+            //Equal or more IDs than total images.
+            $query['post__in'] = $ids; 
+            
+            $attachments = get_posts( $query );
+        } else {
+            //Less IDs than total images.   
+            $diff = $args['num'] - count( $ids );
+
+            //Original query continues, but number changed to difference
+            //Excludes specified IDs
+            $query['posts_per_page'] = $diff;
+            $query['post__not_in'] = $ids;
+            
+            $attachments = get_posts( $query );
+            wp_reset_postdata();
+            
+            //new query retrieves specified IDs
+            $include = array(
+                'post_type' => 'attachment',
+                'post_mime_type' => 'image',
+                'posts_per_page' => count( $ids ),
+                'post__in' => $ids,
+            );
+            $included = get_posts( $include );
+
+            //smoosh all posts together
+            $all = array_merge( $attachments, $included );
+
+            //order by whatever they were supposed to be ordered by
+            switch( strtolower( $args['order'] ) ) {
+                case 'newest':
+                    $sort = SORT_DESC;
+                break;
+                    
+                case 'oldest':
+                    $sort = SORT_ASC;
+                break;
+                        
+                default:
+                    $sort = 'random';
+                break;
+            }
+            
+            if( $sort == 'random' ) {
+                shuffle( $all );
+            } else {
+                
+                $date = array();
+
+                foreach( $all as $key => $row ) {
+                    $date[$key] = $row->post_date;
+                }
+                array_multisort( $date, $sort, $all );   
+                
+            }
+            
+            //return
+            return $all;
+            
+        }
+
+        return $attachments;
     }
 
 
@@ -224,14 +319,9 @@ class sb_easy_image_display {
 
     function sb_easy_image_widget_js() {
         echo "<script type='text/javascript'>
-                window.onload = init;
-
-                function init(){
-                    jQuery('.widget-inside').on( 'click', '#sb-easy-image-advanced-toggle', function () {
-                        jQuery(this).siblings('#sb-easy-image-advanced').toggle();
-                    });
+                function sb_advanced_toggle(el){    
+                    jQuery(el).siblings('#sb-easy-image-advanced').toggle();
                 } 
-
             </script>";
     }
 

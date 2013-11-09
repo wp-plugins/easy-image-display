@@ -2,7 +2,7 @@
 Contributors: Shellbot
 Tags: image, gallery, latest image, random image
 Requires at least: 3.5
-Tested up to: 3.6.1
+Tested up to: 3.7.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -18,6 +18,7 @@ images uploaded to your site.
 
 Current features include:
 
+* Include/exclude images based on ID
 * Widget, shortcode and template tag for maximum flexibility
 * Display images at various sizes
 * Control how many images are displayed and in how many columns
@@ -26,8 +27,7 @@ Current features include:
 
 Features soon to be added:
 
-* Include/exclude images based on ID
-* Include/exclude only images associated with content, or only used as feature images
+* Filter images by attachment status
 * Slideshow layout
 * Custom image sizes
 
@@ -79,7 +79,7 @@ For full list of parameters see [the plugin release page](http://shellbotics.com
 
 == Installation ==
 
-1. Upload the 'sb-easy-image-display' folder to the '/wp-content/plugins/' directory
+1. Upload the 'easy-image-display' folder to the '/wp-content/plugins/' directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Add images using the widget, shortcode or template tag
 4. Enjoy!
@@ -97,7 +97,11 @@ please post in [the plugin support forum](http://wordpress.org/support/plugin/ea
 
 == Changelog ==
 
-= 1.01 =
+= 1.0.2 =
+* Added option to include/exclude images based on ID
+* Fixed issue with widget form not expanding correctly
+
+= 1.0.1 =
 * Fixed an incompatibility with other lightbox plugins
 
 = 1.0 =
@@ -105,5 +109,8 @@ please post in [the plugin support forum](http://wordpress.org/support/plugin/ea
 
 == Upgrade Notice ==
 
-= 1.01 =
+= 1.0.2 =
+* New feature! Include/exclude images based on ID.
+
+= 1.0.1 =
 Fixes an incompatibility with other lightbox plugins.

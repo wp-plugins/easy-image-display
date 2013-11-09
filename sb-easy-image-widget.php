@@ -1,7 +1,7 @@
 <?php
 /**
  * Widget Name: Easy Image Display
- * Version: 1.01
+ * Version: 1.0.2
  */
 
 
@@ -44,6 +44,8 @@ class SB_Easy_Image_Widget extends WP_Widget {
         $instance['size']    = $new_instance['size'];
         $instance['columns'] = $new_instance['columns'];
         $instance['link']    = $new_instance['link'];
+        $instance['filter']    = $new_instance['filter'];
+        $instance['ids']    = $new_instance['ids'];
 
         return $instance;
     }
@@ -53,32 +55,37 @@ class SB_Easy_Image_Widget extends WP_Widget {
     function sb_easy_image_params() { 
 
         $params = array(
-            'include' => array (
+            'include' => array(
                 'Show all',
                 'Include only',
                 'Exclude',  
             ), 
-            'yesno' => array (
+            'yesno' => array(
                 'Yes',
                 'No',  
             ), 
-            'order' => array (
+            'order' => array(
                 'Newest',
                 'Oldest',
                 'Random',
             ), 
-            'sizes' => array (
+            'sizes' => array(
                 'Thumbnail',
                 'Medium',
                 'Large',
                 'Full',
             ), 
-            'link' => array (
+            'link' => array(
                 'None',
                 'Lightbox',
                 'Attachment',
                 'File',
-            )
+            ),
+            'filter' => array(
+                'Only',
+                'Include',
+                'Exclude',
+            ),
         );
 
         return $params;
@@ -97,6 +104,7 @@ class SB_Easy_Image_Widget extends WP_Widget {
                 'num' => 1, 
                 'link' => 'File',
                 'columns' => 1,
+                'filter' => 'Only',
             );
 
             $instance = wp_parse_args( (array) $instance, $defaults ); 
@@ -131,7 +139,7 @@ class SB_Easy_Image_Widget extends WP_Widget {
                 </select>
             </p>
 
-            <a id="sb-easy-image-advanced-toggle" href="#">Advanced settings</a>
+            <a id="sb-easy-image-advanced-toggle" href="#" onclick="javascript:sb_advanced_toggle( jQuery(this) ); return false;">Advanced settings</a>
 
             <div id="sb-easy-image-advanced" style="display:none;">
 
@@ -172,6 +180,28 @@ class SB_Easy_Image_Widget extends WP_Widget {
                 <label for="<?php echo $this->get_field_id( 'columns' ); ?>"><?php esc_html_e( 'Number of columns to display', 'shellbotics' ); ?></label>
                 <input id="<?php echo $this->get_field_id( 'columns' ); ?>" type="text" name="<?php echo $this->get_field_name( 'columns' ); ?>" value="<?php echo $instance['columns']; ?>" class="widefat" />
             </p>  
+            
+            <!-- Filter -->
+            <p>
+                <label for="<?php echo $this->get_field_id( 'filter' ); ?>"><?php esc_html_e('Filter:', 'shellbotics'); ?></label>
+                <select id="<?php echo $this->get_field_id( 'filter' ); ?>" name="<?php echo $this->get_field_name( 'filter' ); ?>" >
+                    <?php
+                    foreach ( $params['filter'] as $filter ) {
+                    ?>
+                        <option value="<?php echo $filter; ?>" <?php if ( $filter == $instance['filter'] ) { echo 'selected="selected"'; } ?>>
+                            <?php echo $filter; ?>
+                        </option>
+                    <?php
+                    } 
+                    ?>
+                </select>
+            </p>
+                
+            <!-- Image IDs -->
+            <p>
+                <label for="<?php echo $this->get_field_id( 'ids' ); ?>"><?php esc_html_e( 'Image IDs (separate with comma)', 'shellbotics' ); ?></label>
+                <input id="<?php echo $this->get_field_id( 'ids' ); ?>" type="text" name="<?php echo $this->get_field_name( 'ids' ); ?>" value="<?php echo $instance['ids']; ?>" class="widefat" />
+            </p>  
 
             </div>
 
@@ -193,6 +223,8 @@ class SB_Easy_Image_Widget extends WP_Widget {
             'size'    => $instance['size'],
             'link'    => $instance['link'],  
             'columns' => $instance['columns'],
+            'filter'  => $instance['filter'],
+            'ids'     => $instance['ids'],
         );
 
         echo $before_widget;
