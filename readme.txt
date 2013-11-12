@@ -97,6 +97,9 @@ please post in [the plugin support forum](http://wordpress.org/support/plugin/ea
 
 == Changelog ==
 
+= 1.1.0 =
+* Fixed version numbering
+
 = 1.0.2 =
 * Added option to include/exclude images based on ID
 * Fixed issue with widget form not expanding correctly
@@ -108,6 +111,9 @@ please post in [the plugin support forum](http://wordpress.org/support/plugin/ea
 * First version
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+* New feature! Include/exclude images based on ID.
 
 = 1.0.2 =
 * New feature! Include/exclude images based on ID.
