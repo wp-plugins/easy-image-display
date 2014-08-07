@@ -3,7 +3,7 @@
 Plugin Name: Easy Image Display
 Plugin URI: http://shellbotics.com/wordpress-plugins/easy-image-display/
 Description: An easy way to display random or latest images on your site.
-Version: 1.1.1
+Version: 1.2.0
 Author: Shellbot
 Author URI: http://shellbotics.com
 License: GPLv2 or later
@@ -56,10 +56,10 @@ class sb_easy_image_display {
         wp_enqueue_style( 'colorbox-css' );
     }
 
-    function public_js() {
+    function public_js( $gallery_id = '' ) {
         echo '<script type="text/javascript">
                 jQuery(document).ready(function() {
-                  jQuery(".gallery a").colorbox({
+                  jQuery("#' . $gallery_id . ' a").colorbox({
                     maxWidth: "80%",
                     maxHeight: "80%",
                   });
@@ -186,12 +186,43 @@ class sb_easy_image_display {
             case 'oldest':
                 $query['order'] = 'ASC';
             break;
+            case 'custom': 
+                $query['orderby'] = 'post__in';
+                $query['order'] = 'ASC';
+            break;
         };
         
         if( $args['ids'] && strtolower( $args['filter'] ) == 'include' ) {
+            
             $attachments = $this->include_action( $args, $query );
+            
         } elseif( $args['ids'] ) {
-            $ids = explode( ',', $args['ids'] );
+            
+            if( false != strpos( $args['ids'], '-' ) ) { //IDs include a range
+                
+                $temp_ids = explode( ',', $args['ids'] );
+                $ids = array();
+                
+                foreach ($temp_ids as $k => $v) {
+
+                    // Is there a dash?
+                    $dash = strpos($v, '-');
+                    if ($dash) {
+                        $from = intval(substr($v, 0, $dash));
+                        $to = intval(substr($v, $dash + 1));
+
+                        for ($i = $from; $i <= $to; $i ++) {
+                            $ids[] = "$i";
+                        }
+                    }
+                    else { // No, just insert next in the array
+                        $ids[] = "$v";
+                    }
+                }
+
+            } else { //no ranges, straighforward explode
+                $ids = explode( ',', $args['ids'] );
+            }
             
             if( strtolower( $args['filter'] ) == 'exclude' ) {
                 $query['post__not_in'] = $ids; 
@@ -199,7 +230,7 @@ class sb_easy_image_display {
                 //Default "only"
                 $query['post__in'] = $ids; 
             }
-            
+
             $attachments = get_posts( $query );
         } else {
             $attachments = get_posts( $query );
@@ -302,6 +333,11 @@ class sb_easy_image_display {
         }
 
         $output = gallery_shortcode($attr);
+        
+        //find gallery ID
+        $pattern = '/gallery-[0-9]/';
+        preg_match($pattern, $output, $matches);
+        $gallery_id = $matches[0];
 
         // no link
         if ( isset( $attr['link'] ) && 'none' == $attr['link']  ) {
@@ -315,7 +351,7 @@ class sb_easy_image_display {
         }
         
         if( isset( $lightbox ) && 1 == $lightbox ) {
-            $this->public_js();
+            $this->public_js( $gallery_id );
         }
 
         return $output;

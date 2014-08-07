@@ -1,7 +1,7 @@
 <?php
 /**
  * Widget Name: Easy Image Display
- * Version: 1.1.1
+ * Version: 1.2.0
  */
 
 
@@ -69,6 +69,7 @@ class SB_Easy_Image_Widget extends WP_Widget {
                 'Newest',
                 'Oldest',
                 'Random',
+                'Custom',
             ), 
             'sizes' => array(
                 'Thumbnail',
