@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Easy Image Display
-Plugin URI: http://shellbotics.com/wordpress-plugins/easy-image-display/
+Plugin URI: http://codebyshellbot.com/wordpress-plugins/easy-image-display/
 Description: An easy way to display random or latest images on your site.
 Version: 1.2.2
 Author: Shellbot
-Author URI: http://shellbotics.com
+Author URI: http://codebyshellbot.com
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
