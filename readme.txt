@@ -124,6 +124,9 @@ and can therefore be ordered correctly.
 
 == Changelog ==
 
+= 1.2.3 =
+* Fixed problem with caption links + lightbox
+
 = 1.2.2 =
 * Added option to show/hide captions
 
@@ -154,6 +157,9 @@ and can therefore be ordered correctly.
 * First version
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+* Fixes problem with caption links + lightbox
 
 = 1.2.2 =
 * New feature! Show/hide image captions.
